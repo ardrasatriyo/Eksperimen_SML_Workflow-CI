@@ -30,7 +30,7 @@ jobs:
 
       - name: Train model via MLproject
         run: |
-          cd MLProject && mlflow run . -e tune 
+          cd MLProject && mlflow run . -e tune --env-manager local
 
       - name: Login to DockerHub
         uses: docker/login-action@v2

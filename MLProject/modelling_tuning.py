@@ -16,10 +16,10 @@ def eval_metrics(actual, pred):
     return accuracy, precision, recall, f1
 
 if __name__ == "__main__":
-    # Ensure dataset is available
-    if not os.path.exists("data/train.csv"):
+    # Ensure dataset is available, generate fallback for CI if needed
+    if not os.path.exists("wine_preprocessing/train.csv"):
         print("Data fallback: generating from scikit-learn for CI...")
-        os.makedirs("data", exist_ok=True)
+        os.makedirs("wine_preprocessing", exist_ok=True)
         from sklearn.datasets import load_wine
         from sklearn.model_selection import train_test_split
         from sklearn.preprocessing import StandardScaler
@@ -29,20 +29,20 @@ if __name__ == "__main__":
         y = df['target']
         X_scaled = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
         X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
-        pd.concat([X_train, y_train], axis=1).to_csv('data/train.csv', index=False)
-        pd.concat([X_test, y_test], axis=1).to_csv('data/test.csv', index=False)
+        pd.concat([X_train, y_train], axis=1).to_csv('wine_preprocessing/train.csv', index=False)
+        pd.concat([X_test, y_test], axis=1).to_csv('wine_preprocessing/test.csv', index=False)
 
-    train_df = pd.read_csv("data/train.csv")
-    test_df = pd.read_csv("data/test.csv")
+    train_df = pd.read_csv("wine_preprocessing/train.csv")
+    test_df = pd.read_csv("wine_preprocessing/test.csv")
 
     X_train = train_df.drop(columns=['target'])
     y_train = train_df['target']
     X_test = test_df.drop(columns=['target'])
     y_test = test_df['target']
 
-    print("Configuring DagsHub MLflow...")
-    import dagshub
-    dagshub.init(repo_owner='ardrasatriyo', repo_name='Eksperimen_SML_Ardra_Chandra_Satriyo', mlflow=True)
+    print("Configuring MLflow tracking URI...")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "https://dagshub.com/ardrasatriyo/Eksperimen_SML_Ardra_Chandra_Satriyo.mlflow")
+    mlflow.set_tracking_uri(tracking_uri)
 
     mlflow.set_experiment("Wine_Quality_Tuning_Experiment")
     
