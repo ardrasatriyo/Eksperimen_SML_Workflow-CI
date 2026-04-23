@@ -16,20 +16,8 @@ def eval_metrics(actual, pred):
 
 if __name__ == "__main__":
     if not os.path.exists("wine_preprocessing/train.csv"):
-        print("Data fallback: generating from scikit-learn for CI...")
-        os.makedirs("wine_preprocessing", exist_ok=True)
-        from sklearn.datasets import load_wine
-        from sklearn.model_selection import train_test_split
-        from sklearn.preprocessing import StandardScaler
-        data = load_wine(as_frame=True)
-        df = data.frame.dropna()
-        X = df.drop(columns=['target'])
-        y = df['target']
-        X_scaled = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
-        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
-        pd.concat([X_train, y_train], axis=1).to_csv('wine_preprocessing/train.csv', index=False)
-        pd.concat([X_test, y_test], axis=1).to_csv('wine_preprocessing/test.csv', index=False)
-
+        print("Data not found. Pastikan dataset preprocessing tersedia di folder wine_preprocessing.")
+        sys.exit(1)
     train_df = pd.read_csv("wine_preprocessing/train.csv")
     test_df = pd.read_csv("wine_preprocessing/test.csv")
 
