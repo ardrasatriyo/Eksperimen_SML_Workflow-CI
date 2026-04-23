@@ -16,16 +16,22 @@ def eval_metrics(actual, pred):
     return accuracy, precision, recall, f1
 
 if __name__ == "__main__":
-    # Ensure dataset is available
-    if not os.path.exists("data/train.csv"):
+    # Ensure dataset is available, generate fallback for CI if needed
+    if not os.path.exists("wine_preprocessing/train.csv"):
         print("Data fallback: generating from scikit-learn for CI...")
-        os.makedirs("data", exist_ok=True)
+        os.makedirs("wine_preprocessing", exist_ok=True)
         from sklearn.datasets import load_wine
         from sklearn.model_selection import train_test_split
         from sklearn.preprocessing import StandardScaler
-    if not os.path.exists("wine_preprocessing/train.csv"):
-        print("Data not found. Silakan jalankan automate_Ardra_Chandra_Satriyo.py terlebih dahulu.")
-        sys.exit(1)
+        data = load_wine(as_frame=True)
+        df = data.frame.dropna()
+        X = df.drop(columns=['target'])
+        y = df['target']
+        X_scaled = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+        pd.concat([X_train, y_train], axis=1).to_csv('wine_preprocessing/train.csv', index=False)
+        pd.concat([X_test, y_test], axis=1).to_csv('wine_preprocessing/test.csv', index=False)
+
 
     train_df = pd.read_csv("wine_preprocessing/train.csv")
     test_df = pd.read_csv("wine_preprocessing/test.csv")
