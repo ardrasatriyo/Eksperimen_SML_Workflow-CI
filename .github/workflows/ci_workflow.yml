@@ -30,6 +30,7 @@ jobs:
 
       - name: Train model via MLproject
         run: |
+          cd MLProject && mlflow run . -e main --env-manager local
           cd MLProject && mlflow run . -e tune --env-manager local
 
       - name: Login to DockerHub

@@ -32,6 +32,7 @@ if __name__ == "__main__":
     # Autolog MLflow tracking
     tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "https://dagshub.com/ardrasatriyo/Eksperimen_SML_Ardra_Chandra_Satriyo.mlflow")
     mlflow.set_tracking_uri(tracking_uri)
+    mlflow.set_experiment("Wine_Quality_Tuning_Experiment")
     mlflow.sklearn.autolog()
 
     print("Training basic RandomForest model...")
